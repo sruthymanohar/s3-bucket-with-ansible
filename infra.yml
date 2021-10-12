@@ -1,0 +1,51 @@
+---
+- name: "s3 bucket creation"
+  gather_facts: no
+  connection: local
+  become: yes
+  hosts: localhost
+  vars:
+    bucketname: fujikomalanstudentsruthyanumol
+    access_key: "AKIASAIGV3IQVXQ5MMRP"
+    secret_key: "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"
+    region: "ap-south-1"
+
+  tasks:
+    - name: "installtion of pip module"
+      yum:
+        name: pip
+        state: present
+    - name: Ensure boto and boto3 modules are installed
+      pip:
+        name: "{{ item }}"
+      with_items:
+        - boto3
+        - botocore
+    - name: "create a s3 bucket"
+      s3_bucket:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        ec2_region: "{{ region }}"
+        name: "{{ bucketname }}"
+        policy: "{{ lookup( 'file','my_bucket_policy.json' )}}"
+        versioning: no
+        state: present
+
+    - name: "upload images to the s3bucket"
+      s3_sync:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        ec2_region: "{{ region }}"
+        bucket: "{{ bucketname }}"
+        file_root: /var/deployment/test/
+
+    - name: "s3 bucket as webiste"
+      s3_website:
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        ec2_region: "{{ region }}"
+        name: "{{ bucketname }}"
+        suffix: index.html
+        error_key: errors/404.htm
+        state: present
+

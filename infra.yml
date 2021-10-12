@@ -6,8 +6,8 @@
   hosts: localhost
   vars:
     bucketname: fujikomalanstudentsruthyanumol
-    access_key: "AKIASAIGV3IQVXQ5MMRP"
-    secret_key: "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"
+    access_key: "*******"
+    secret_key: "********************"
     region: "ap-south-1"
 
   tasks:
